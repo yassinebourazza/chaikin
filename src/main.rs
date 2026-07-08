@@ -19,48 +19,62 @@ struct Point {
 async fn main() {
     let mut points = Vec::new();
     let mut copy_points = Vec::new();
-
-    let mut enterPresed=false;
+    let mut enter_pressed=false;
     let mut iteration = 0;
     let mut last_update = 0.0;
+    let mut err_msg = false;
 
     loop {
-        clear_background(WHITE);
+        clear_background(DARKGRAY);
+        draw_text("[   ] : Exit | [         ] : Clear | [     ] : Apply", 10.0, 15.0, 16.0, LIGHTGRAY);
+        draw_text("[ESC]          [BACKSPACE]           [SPACE]        ", 10.0, 15.0, 16.0, SKYBLUE);
+        
 
-        if is_mouse_button_pressed(MouseButton::Left) &&!enterPresed {
+        if is_mouse_button_pressed(MouseButton::Left) &&!enter_pressed {
+            err_msg = false;
             let (x, y) = mouse_position();
             points.push(Point{x,y});
             println!{"{:?}",points};
         }
         
         if is_key_pressed(KeyCode::Escape) {
-            enterPresed=false;
-            points = Vec::new();
-            iteration = 0;
-            last_update = 0.0;
-
+            break;
+            
         }
         
         if is_key_pressed(KeyCode::Backspace) {
+            enter_pressed=false;
             points.clear();
+            copy_points.clear();
+            last_update = 0.0;
+            iteration = 0;
             println!{"{:?}",points};
         }
        
          for point in &points {
-            draw_circle(point.x, point.y, 3.0, SKYBLUE);
+            draw_circle_lines(point.x, point.y, 2.0, 1.0, SKYBLUE)
         }
-        if !enterPresed{
+        if !enter_pressed{
         for i in 0..points.len().saturating_sub(1) {
             draw_line(points[i].x, points[i].y,points[i + 1].x,points[i + 1].y,2.0,GRAY);
         }
         }
        
-        if is_key_pressed(KeyCode::Enter) && !enterPresed &&points.len()>0{
-         copy_points=points.clone();
-          enterPresed = true;
-          iteration = 0;
+        if is_key_pressed(KeyCode::Enter) && !enter_pressed &&points.len()>0{
+            if points.len() == 1 {
+                err_msg = true;
+            } else {
+                copy_points=points.clone();
+                enter_pressed = true;
+                iteration = 0;
+            }
        }
-       if enterPresed && iteration <= 7{
+
+       if err_msg {
+            draw_text("Two points are required", 10.0, 30.0, 16.0, RED);
+       }
+
+       if enter_pressed && iteration <= 7{
 
          if iteration <= 7&& get_time() - last_update > 0.7{
               copy_points = chaikin_step(&copy_points);
@@ -74,14 +88,7 @@ async fn main() {
      
          for i in 0..copy_points.len().saturating_sub(1) {
             
-             draw_line(
-                 copy_points[i].x,
-                 copy_points[i].y,
-                 copy_points[i + 1].x,
-                 copy_points[i + 1].y,
-                 2.0,
-                 GRAY,
-             );
+             draw_line(copy_points[i].x,copy_points[i].y,copy_points[i + 1].x,copy_points[i + 1].y,2.0,GRAY);
          }
         }
        
