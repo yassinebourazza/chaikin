@@ -45,7 +45,6 @@ async fn main() {
             err_msg = false;
             let (x, y) = mouse_position();
             points.push(Point { x, y });
-            println!("{:?}", points);
         }
 
         if is_key_pressed(KeyCode::Escape) {
@@ -58,7 +57,6 @@ async fn main() {
             copy_points.clear();
             last_update = 0.0;
             iteration = 0;
-            println!("{:?}", points);
         }
 
         for point in &points {
@@ -91,9 +89,9 @@ async fn main() {
                 last_update = get_time();
             }
 
-            draw_text(format!("Step: {}", iteration + 1), 10.0, 50.0, 20.0, WHITE);
+            draw_text(format!("Step: {}", iteration ), 10.0, 50.0, 20.0, WHITE);
 
-            if iteration == 7 {
+            if iteration > 7 {
                 copy_points = points.clone();
                 iteration = 0;
             }
